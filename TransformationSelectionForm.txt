@@ -1,0 +1,61 @@
+Private Sub UserForm_Initialize()
+Call index_dim
+    ' Populates transformation selection combobox
+    transformationsComboBox.AddItem "Please select"        'ListIndex = 0
+    transformationsComboBox.AddItem "Similarity"     'ListIndex = 1
+    transformationsComboBox.AddItem "Affine"     'ListIndex = 2
+    transformationsComboBox.AddItem "Bilinear"       'ListIndex = 3
+    transformationsComboBox.AddItem "Polynomial"       'ListIndex = 4
+    
+
+    transformationsComboBox.Style = fmStyleDropDownList
+    transformationsComboBox.BoundColumn = 0
+    transformationsComboBox.ListIndex = 0
+
+End Sub
+Private Sub transformationsComboBox_Click()
+    Select Case transformationsComboBox.Value
+    Case 0  'Please Select
+        hintLabel.Caption = ""
+    Case 1  'Similar
+        hintLabel.Caption = "Select at least 2 couples of points."
+        numberOfParameters = 4
+        degree = 0
+        index = "Similarity"
+    Case 2  'Affine
+        hintLabel.Caption = "Select at least 3 couples of points."
+        numberOfParameters = 3
+        degree = 1
+        index = "Affine"
+    Case 3  'Bilinear
+        hintLabel.Caption = "Select at least 4 couples of points."
+        numberOfParameters = 4
+        degree = 1
+        index = "Bilinear"
+    Case 4  'Polynomial
+        hintLabel.Caption = "Select at least as many points the degree demands."
+        index = "Polynomial"
+    End Select
+    
+End Sub
+
+Private Sub okButton_Click()
+    Select Case transformationsComboBox.Value
+   
+    Case 0
+        MsgBox "Choose transformation."
+    Case 4 'polynomial
+        'Load UserForm2
+        TransformationSelectionForm.hide
+        PolynomialTransformationConfigForm.Show
+    Case Else:
+        'Load UserForm2
+        TransformationSelectionForm.hide
+        TransformationConfigForm.Show
+
+    End Select
+End Sub
+
+Private Sub cancelButton_Click() 'Akyro
+    hide
+End Sub

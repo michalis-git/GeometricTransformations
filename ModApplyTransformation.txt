@@ -1,0 +1,341 @@
+Attribute VB_Name = "ModTRANSFORMATION"
+Public inverse_N As Variant
+Public Transpose_A As Variant
+Public kr As Variant
+Public lr As Variant
+Public vathmos As Single
+Public parameters As Single
+Public sigma_apriori As Double
+Public sigma_aposteriori As Double
+Public feley8erias As Single
+Public n1 As Integer
+Public met As Integer
+Public b As Variant
+Public xekt As Variant
+Sub transformation(parameters2 As Single, vathmos As Single, n As Integer, ListBox1 As ListBox, ListBox2 As ListBox)
+
+If index = "Similarity" Then
+parameters2 = parameters2 / 2
+Else
+End If
+
+feley8erias = 2 * n - (2 * parameters2)
+'MsgBox "f =" & feley8erias
+If feley8erias < 0 Then
+MsgBox "Solution is not possible."
+Else
+'MsgBox "mix" & parameters2
+Dim getitemtext As String
+Dim xnumb As Single
+Dim ynumb As Single
+Dim x As String
+Dim y As String
+
+Dim Xprnumb As Single
+Dim Yprnumb As Single
+Dim Xpr
+Dim Ypr
+Dim k As Single
+Dim l As Single
+
+'dhlwsh pinakwn A kai b
+'ReDim A(1 To 2 * n, 1 To 2 * parameters2) As Variant
+ReDim b(1 To 2 * n)
+ReDim kr(1 To parameters2)
+ReDim lr(1 To parameters2)
+ReDim xvect(1 To n) As Variant
+ReDim yvect(1 To n) As Variant
+
+If index = "Bilinear" Then 'GIA DIGRAMMIKO
+    ReDim kr(0 To parameters2)
+    ReDim lr(0 To parameters2)
+    kr = Array(0, 0, 1, 0, 1)  'ena parapanw stoixeio sthn arxh gt stoys arrays
+    lr = Array(0, 0, 0, 1, 1) ' to index 3ekinaei apo to 0
+    met = 4
+Else
+    'dhmioyrgei 2 dianysmata pou periexoun toys ek8etes
+    'gia ton algori8mo twn stoixeiwn toy A
+    ReDim kr(1 To parameters2)
+    ReDim lr(1 To parameters2)
+    met = 0
+    For k = 0 To vathmos
+        For l = 0 To k
+            met = met + 1
+            kr(met) = k - l
+            lr(met) = l
+            'MsgBox kr(met) & ", " & lr(met)
+        Next l
+    Next k
+End If
+
+'typwnei ta dianysmata kr(i) kai lr(i)
+Dim i As Integer
+Open "c:\temp\kr.txt" For Output As #3
+For i = 1 To parameters2
+''''MsgBox "kr" & kr(i)
+    Print #3, kr(i),
+Next i
+Close #3
+
+'dhmioyrgei 2 dianysmata me tis yimes twn xi kai yi
+'gia ton algori8mo twn stoixeiwn toy A
+Dim themis As Variant
+Dim THEMIS1 As Variant
+Dim THEMIS2 As Variant
+Dim themis3 As Variant
+For i = 0 To ListBox1.ListCount - 1
+    'lhpsh x synt/nhs
+    getitemtext = ListBox1.List(i)
+    themis = InStr(getitemtext, ")")
+    THEMIS1 = InStr(getitemtext, ",")
+    x = VBA.Mid(getitemtext, themis + 1, THEMIS1 - 3)
+    xnumb = Val(x)
+    'lhpsh y synt/nhs
+    y = VBA.Mid(getitemtext, THEMIS1 + 1)
+    'MsgBox x & "and" & y
+    ynumb = Val(y)
+    'MsgBox xnumb & "and" & ynumb
+    'lhpsh X (provolikhs) synt/nhs
+    getitemtext = ListBox2.List(i)
+    THEMIS2 = InStr(getitemtext, ")")
+    themis3 = InStr(getitemtext, ",")
+    Xpr = VBA.Mid(getitemtext, THEMIS2 + 1, themis3 - 3)
+    Xprnumb = Val(Xpr)
+    'lhpsh Y (probolikhs) synt/nhs
+    Ypr = VBA.Mid(getitemtext, themis3 + 1)
+    Yprnumb = Val(Ypr)
+    
+    'CREATE b
+    b(i + 1) = Xprnumb
+    b(i + n + 1) = Yprnumb
+
+    'CREATE A
+    xvect(i + 1) = xnumb
+    yvect(i + 1) = ynumb
+    ''''MsgBox "kanonika:" & x & ", " & y & ", " & Xpr & ", " & Ypr
+    'MsgBox "me str:" & xnumb & ", " & ynumb & ", " & Xprnumb & ", " & Yprnumb
+Next i
+
+If index = "Similarity" Then
+'Dim a2dim As Integer
+'a2dim = 2 * parameters2
+ReDim A(1 To 2 * n, 1 To 2 * parameters2) As Variant
+'ReDim A(2 * n, a2dim)  'As Variant
+Call A_OMOIOTHTAS(parameters2, A, n)
+Else
+    ReDim amikros(1 To n, 1 To parameters2) As Variant
+    'yplogigei ena tmhma tou PINAKA SXEDIASMOU, to pinaka amikros
+    For i = 1 To n
+        For j = 1 To met
+        amikros(i, j) = xvect(i) ^ kr(j) * yvect(i) ^ lr(j)
+        ''''MsgBox "j = " & j & " kr(j) " & kr(j) & "   lr(j) " & lr(j)
+        Next j
+    Next i
+    'yplogigei ton PINAKA SXEDIASMOU A
+    ReDim A(1 To 2 * n, 1 To 2 * parameters2) As Variant
+    For i = 1 To 2 * n
+        For j = 1 To 2 * parameters2
+        If i <= n And j <= parameters2 Then
+        A(i, j) = amikros(i, j)
+        Else
+        If (n + 1) <= i And (parameters2 + 1) <= j Then
+        A(i, j) = amikros(i - n, j - parameters2)
+        Else: A(i, j) = 0
+        End If
+        End If
+        Next j
+    Next i
+
+    'typwnei ton A
+    Open "c:\temp\pinakasA.txt" For Output As #1
+    For i = 1 To 2 * n
+        For j = 1 To 2 * parameters2
+        Print #1, A(i, j),
+        Next j
+        Print #1,    ' Print blank line to file.
+    Next i
+    Close #1
+End If
+
+'typwnei ton b
+Open "c:\temp\pinakasb.txt" For Output As #3
+For i = 1 To 2 * n
+    Print #3, b(i)
+Next i
+Close #3
+
+'sayto to shmeio vgainei enas dialogos pou rwtaei an o xrhsths
+'epi8ymei na eisagei kapoies symmetavlhtothtes
+   'Dim Msg, Style, Title, Help, Ctxt, Response, MyString
+
+'dhmioyrgei dokimastika ton P
+'pinaka varwn
+ReDim P(1 To 2 * n, 1 To 2 * n) As Variant
+For i = 1 To 2 * n
+    For j = 1 To 2 * n
+    If i = j Then
+    P(i, j) = 1
+    Else
+    P(i, j) = 0
+    End If
+    Next j
+Next i
+
+'typwnei ton P
+Open "c:\temp\P.txt" For Output As #10
+For i = 1 To 2 * n
+    For j = 1 To 2 * n
+    Print #10, P(i, j),
+    Next j
+    Print #10,    ' Print blank line to file.
+Next i
+Close #10
+
+'TRANSPOSE MATRIX
+ReDim Transpose_A(1 To 2 * parameters2, 1 To 2 * n) As Variant
+Call TransposeMatrix(parameters2, A, n)
+
+Open "c:\temp\Transpose_A.txt" For Output As #2  'prints Transpose_A
+For i = 1 To 2 * parameters2
+    For j = 1 To 2 * n
+    Print #2, Transpose_A(i, j),
+    Next j
+    Print #2,    ' Print blank line to file.
+Next i
+Close #2
+
+'MULTIPLICATION TRANSPOSE_A * P (=AT*P)
+ReDim ATP(1 To 2 * parameters2, 1 To 2 * n)
+For k = 1 To 2 * parameters2
+    For m = 1 To 2 * n
+        ATP(k, m) = ATP(k, m) + Transpose_A(k, m) * P(m, m)
+    Next m
+Next k
+
+Open "c:\temp\ATP.txt" For Output As #11  'Prints ATP
+For i = 1 To 2 * parameters2
+    For j = 1 To 2 * n
+    Print #11, ATP(i, j),
+    Next j
+    Print #11,    ' Print blank line to file.
+Next i
+Close #11
+
+
+'PINAKES KANONIKWN E3ISWSEWN (N KAI u)
+'N = TRANSPOSE_A * P * A
+ReDim Nmat(1 To 2 * parameters2, 1 To 2 * parameters2)
+For k = 1 To 2 * parameters2
+    For m = 1 To 2 * parameters2
+        For l = 1 To 2 * n
+            Nmat(k, m) = Nmat(k, m) + ATP(k, l) * A(l, m)
+        Next l
+    Next m
+Next k
+'typwnei ton N
+Open "c:\temp\Nmat.txt" For Output As #12
+For i = 1 To 2 * parameters2
+    For j = 1 To 2 * parameters2
+    Print #12, Nmat(i, j),
+    Next j
+    Print #12,    ' Print blank line to file.
+Next i
+Close #12
+
+ReDim u(1 To 2 * parameters2) As Variant
+For k = 1 To 2 * parameters2
+        For l = 1 To 2 * n
+            u(k) = u(k) + ATP(k, l) * b(l)
+        Next l
+Next k
+'typwnei ton u
+Open "c:\temp\u.txt" For Output As #13
+For i = 1 To 2 * parameters2
+    Print #13, u(i),
+Next i
+Close #13
+
+ReDim inverse_N(1 To 2 * parameters2, 1 To 2 * parameters2) As Variant
+Call Inverse_Table(parameters2, Nmat) ', inverse_N)
+
+Open "c:\temp\Inverse_N.txt" For Output As #14
+For i = 1 To 2 * parameters2
+    For j = 1 To 2 * parameters2
+    
+    Print #14, inverse_N(i, j),
+    Next j
+    Print #14,    ' Print blank line to file.
+Next i
+Close #14
+
+ReDim xekt(1 To 2 * parameters2)
+For k = 1 To 2 * parameters2
+        For l = 1 To 2 * parameters2
+            xekt(k) = xekt(k) + inverse_N(k, l) * u(l)
+        Next l
+Next k
+'typwnei ton xekt (ektimiseis parametrwn)
+Open "c:\temp\xekt.txt" For Output As #15
+For i = 1 To 2 * parameters2
+    Print #15, xekt(i),
+Next i
+Close #15
+
+ReDim AX_mat(1 To 2 * n)
+For k = 1 To 2 * n
+        For l = 1 To 2 * parameters2
+            AX_mat(k) = AX_mat(k) + A(k, l) * xekt(l)
+        Next l
+Next k
+
+ReDim v(1 To 2 * n)
+For i = 1 To 2 * n
+    v(i) = b(i) - AX_mat(i)
+Next i
+
+Open "c:\temp\v.txt" For Output As #16
+For i = 1 To 2 * n
+    Print #16, v(i),
+Next i
+Close #16
+
+'ReDim vP(2 * n To 2 * n)
+'For k = 1 To 2 * n
+        'For l = 1 To 2 * n
+            'vP(k) = vP(k) + v(k) * P(k, l)
+        'Next l
+'Next k
+
+'ReDim v2(1 To 2 * n)
+'For k = 1 To 2 * n
+        'For l = 1 To 2 * n
+            'v2(k) = v2(k) + vP(k, l) * v(l)
+        'Next l
+'Next k
+
+'Open "c:\v.txt" For Output As #17
+'For i = 1 To 2 * n
+    'Print #17, v2(i),
+'Next i
+'Close #17
+
+
+If feley8erias = 0 Then
+MsgBox "Solution without least square method application."
+Else
+'Dim sigma_aposteriori As Double
+For i = 1 To 2 * n
+  stoixeio = v(i) ^ 2
+  Sstoixeio = Sstoixeio + stoixeio
+Next i
+sigma_aposteriori = Sstoixeio / feley8erias
+F_test = sigma_aposteriori / sigma_apriori
+'MsgBox F_test
+
+Call FTEST(feley8erias, F_test)
+End If
+End If
+
+Call residual(xvect, yvect, xekt, n)
+
+End Sub

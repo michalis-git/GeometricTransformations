@@ -1,0 +1,49 @@
+
+Private Sub CommandButton1_Click()
+
+End Sub
+
+Private Sub CommandButton2_Click() 'koympi SYNEXEIA
+UserForm4_Report.hide
+End Sub
+
+
+Private Sub UserForm_Initialize()
+Label_feley8erias.Caption = feley8erias
+'Label8.Caption = sigma_apriori
+Label_a_posteriori.Caption = sigma_aposteriori
+Label6.Caption = index
+
+If F_test < F_Fisher Then
+str_F_test = Str(F_test)
+'MsgBox "str_F_test= " & str_F_test
+'E_F_test = InStr(str_F_test, "E")
+'E1 = Mid(str_F_test, E_F_test, 4)
+'MsgBox "E1= " & E1
+'F_test1 = Mid(str_F_test, 1, 6)
+'MsgBox "F_test1= " & F_test1 & E1
+
+str_F_Fisher = Str(F_Fisher)
+'MsgBox "str_F_Fisher= " & str_F_Fisher
+'E_F_Fisher = InStr(str_F_Fisher, "E")
+'E11 = Mid(str_F_Fisher, E_F_Fisher, 4)
+'F_Fisher1 = Mid(str_F_Fisher, 1, 6)
+'MsgBox "F_Fisher1= " & F_Fisher1 & E11
+
+Label7.Caption = str_F_test & "<" & str_F_Fisher
+Label8.Caption = "F-test is successful."
+Else
+Label7.Caption = CStr(F_test) & ">" & CDbl(F_Fisher)
+Label8.Caption = "F-test is not successful. Please try a tranformation of higher degree."
+End If
+
+For i = 1 To nn
+ListBox6.AddItem (i)
+ListBox1.AddItem (xvect(i))
+ListBox2.AddItem (yvect(i))
+ListBox3.AddItem (Dx(i))
+ListBox4.AddItem (Dy(i))
+ListBox5.AddItem (sse(i))
+Next i
+End Sub
+
