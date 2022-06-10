@@ -1,0 +1,14 @@
+Attribute VB_Name = "ModTRANSPOSE"
+Sub TransposeMatrix(parameters3 As Single, A3 As Variant, n3 As Integer) ' Transpose_A3 As Variant)
+Dim d1 As Variant
+Dim d2 As Variant
+    
+    For d1 = 1 To 2 * parameters3
+        For d2 = 1 To 2 * n3
+        Transpose_A(d1, d2) = A3(d2, d1)
+        Next d2
+    Next d1
+
+
+End Sub
+

@@ -1,0 +1,85 @@
+VERSION 5.00
+Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} UserForm1 
+   Caption         =   "Choose transformation"
+   ClientHeight    =   1785
+   ClientLeft      =   45
+   ClientTop       =   435
+   ClientWidth     =   3510
+   OleObjectBlob   =   "UserForm1.frx":0000
+   StartUpPosition =   1  'CenterOwner
+End
+Attribute VB_Name = "UserForm1"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = False
+Private Sub UserForm_Initialize()
+Call index_dim
+    'Add list entries to combo box. The value of each
+    'entry matches the corresponding ListIndex value
+    'in the combo box.
+    ComboBox1.AddItem "Please select"        'ListIndex = 0
+    ComboBox1.AddItem "Similarity"     'ListIndex = 1
+    ComboBox1.AddItem "Affine"     'ListIndex = 2
+    ComboBox1.AddItem "Bilinear"       'ListIndex = 3
+    ComboBox1.AddItem "Polynomial"       'ListIndex = 4
+    
+
+    'Use drop-down list
+    ComboBox1.Style = fmStyleDropDownList
+    'Combo box values are ListIndex values
+    ComboBox1.BoundColumn = 0
+    'Set combo box to first entry
+    ComboBox1.ListIndex = 0
+
+End Sub
+Private Sub ComboBox1_Click()
+    Select Case ComboBox1.Value
+    Case 0  'Please Select
+        Label2.Caption = ""
+    Case 1  'Similar
+        Label2.Caption = "Select at least 2 couples of points."
+        parameters = 4
+        vathmos = 0 'kwdika!!!!!
+        index = "Similarity"
+    Case 2  'Affine
+        Label2.Caption = "Select at least 3 couples of points."
+        parameters = 3
+        vathmos = 1
+        index = "Affine"
+    Case 3  'Bilinear
+        Label2.Caption = "Select at least 4 couples of points."
+        parameters = 4
+        vathmos = 1
+        index = "Bilinear"
+    Case 4  'Polynomial
+        Label2.Caption = "Select at least as many points the degree demands."
+        index = "Polynomial"
+    End Select
+    
+End Sub
+
+Private Sub CommandButton1_Click() 'koympi OK
+
+    'se ka8e diaforetiko metasxhmatismo fortwse
+    'kai mia diaforetikh forma
+    Select Case ComboBox1.Value
+   
+    Case 0
+        MsgBox "Choose transformation."
+    Case 4 'polynomial
+        'Load UserForm2
+        UserForm1.hide
+        UserForm3.Show
+    Case Else:
+        'MsgBox parameters
+        'MsgBox vathmos
+        'Load UserForm2
+        UserForm1.hide
+        UserForm2.Show
+
+    End Select
+End Sub
+Private Sub CommandButton2_Click() 'Akyro
+hide
+End Sub

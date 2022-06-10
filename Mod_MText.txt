@@ -1,0 +1,48 @@
+Attribute VB_Name = "Mod_MText"
+Dim mtextObj As AcadText
+Dim mtextString As String
+Dim insertionPoint(0 To 2) As Double
+Dim height As Double
+Sub mtext(ssetMText)
+
+    'MsgBox "πλήθος αντικειμένων = " & ssetMText.Count
+    
+    For Each entObj In ssetMText
+    keimena = keimena + 1
+        ' Return the current value of the insertion point
+        Dim currInsertionPoint As Variant
+        currInsertionPoint = entObj.insertionPoint
+        'MsgBox "The insertion point of the text is " & currInsertionPoint(0) & ", " & currInsertionPoint(1) & ", " & currInsertionPoint(2), vbInformation, "InsertionPoint Example"
+        
+        Ax0 = currInsertionPoint(0)
+        Ay0 = currInsertionPoint(1)
+        axtel = 0: aytel = 0
+    If index = "Smilarity" Then
+        currInsertionPoint(0) = xekt(1) + xekt(2) * Ax0 + xekt(3) * Ay0
+        currInsertionPoint(1) = xekt(4) + xekt(2) * Ay0 - xekt(3) * Ax0
+    Else
+        For j = 1 To met
+        axtel = xekt(j) * Ax0 ^ kr(j) * Ay0 ^ lr(j)
+        aytel = xekt(j + met) * Ax0 ^ kr(j) * Ay0 ^ lr(j)
+        Ax_tel = Ax_tel + axtel
+        Ay_tel = Ay_tel + aytel
+        Next j
+        currInsertionPoint(0) = Ax_tel
+        currInsertionPoint(1) = Ay_tel
+        Ax_tel = 0: Ay_tel = 0
+'        MsgBox "currInsertionPoint(" & i & ") = " & currInsertionPoint(i) & "currInsertionPoint(" & i + 1 & ") = " & currInsertionPoint(i + 1)
+    End If
+        ' Define the text object
+        TextString = entObj.TextString
+        insertionPoint(0) = currInsertionPoint(0): insertionPoint(1) = currInsertionPoint(1): insertionPoint(2) = 0
+        height = entObj.height
+        
+        Call chAddLayer
+        
+        ' Create the text object in model space
+        Set textObj = ThisDrawing.ModelSpace.AddText(TextString, insertionPoint, height)
+        ZoomAll
+    Next
+  
+End Sub
+

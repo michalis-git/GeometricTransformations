@@ -1,0 +1,95 @@
+Attribute VB_Name = "Mod_ssets"
+Public ssetObj As AcadSelectionSet
+Public ssetLines As AcadSelectionSet
+Public ssetPolylines As AcadSelectionSet
+Public ssetMText As AcadSelectionSet
+Public ssetBlock As AcadSelectionSet
+Public grammes, polygrammes, keimena, symbola As Integer
+Public entObj As AcadEntity
+Sub ssets()
+    ' Create the selection set
+    'ThisDrawing.SelectionSets.Item("TEST_SSET").Delete
+    Set ssetObj = ThisDrawing.SelectionSets.Add("TEST_SSET")
+    
+    ' Add objects to a selection set by prompting user to select on the screen
+    ssetObj.SelectOnScreen
+
+    'MsgBox "πλήθος αντικειμένων = " & ssetObj.Count
+    
+    For Each entObj In ssetObj
+    'MsgBox "Item " & CStr(i + 1) & " in " & ssetObj.Name _
+    & "is: " & entObj.EntityName
+    If entObj.EntityName = "AcDbLine" Then
+    grammes = grammes + 1
+    Else
+    If entObj.EntityName = "AcDbPolyline" Then
+    polygrammes = polygrammes + 1
+    Else
+    If entObj.EntityName = "AcDbMText" Then
+    keimena = keimena + 1
+    Else
+    If entObj.EntityName = "AcDbBlockReference" Then
+    symbola = symbola + 1
+    Else
+    End If: End If: End If: End If
+    Next
+    'MsgBox "grammes = " & grammes & ", polygrammes = " & polygrammes & _
+    ", keimena = " & keimena & ", symbola = " & symbola
+    
+    i = 0
+    mix = 0: mix1 = 0: mix2 = 0: mix3 = 0
+    On Error Resume Next
+    ReDim LineObjs(0 To grammes - 1) As AcadLine
+    On Error Resume Next
+    ReDim PolylineObjs(0 To polygrammes - 1) As AcadLWPolyline
+    On Error Resume Next
+    ReDim MTextObjs(0 To keimena - 1) As AcadMText
+    On Error Resume Next
+    ReDim BlockObjs(0 To symbola - 1) As AcadBlockReference
+    
+    For Each entObj In ssetObj
+    'MsgBox "Item " & CStr(i + 1) & " in " & ssetObj.Name _
+    & "is: " & entObj.EntityName
+    If entObj.EntityName = "AcDbLine" Then
+    'xrhsimopoieitai diaforetikh metavlhth ston pinka tvn antikeimenwn
+    'kai sto selectionSet logw toy oti den 8a epilgoun ola ta LineObjs
+    'kai 8a yparxei asymfwnia sta indexes
+    Set LineObjs(mix) = ssetObj.Item(i): 'MsgBox "LineObjs"
+    mix = mix + 1
+    Else
+    If entObj.EntityName = "AcDbPolyline" Then
+    Set PolylineObjs(mix1) = ssetObj.Item(i): 'MsgBox "PolylineObjs"
+    mix1 = mix1 + 1
+    Else
+    If entObj.EntityName = "AcDbMText" Then
+    Set MTextObjs(mix2) = ssetObj.Item(i): 'MsgBox "MTextObjs"
+    mix2 = mix2 + 1
+    Else
+    If entObj.EntityName = "AcDbBlockReference" Then
+    Set BlockObjs(mix3) = ssetObj.Item(i): 'MsgBox "BlockObjs"
+    mix3 = mix3 + 1
+    Else
+    End If: End If: End If: End If
+    i = i + 1
+    Next
+    
+    ' Create a new selection set
+    '''''''''''''''''
+    Set ssetLines = ThisDrawing.SelectionSets.Add("TEST_SSET1")
+    Set ssetPolylines = ThisDrawing.SelectionSets.Add("TEST_SSET2")
+    Set ssetMText = ThisDrawing.SelectionSets.Add("TEST_SSET3")
+    Set ssetBlock = ThisDrawing.SelectionSets.Add("TEST_SSET4")
+    'MsgBox ssetLines.Name & "dhmioyrgh8hke"
+    
+    ssetLines.AddItems LineObjs
+    ssetPolylines.AddItems PolylineObjs
+    ssetMText.AddItems MTextObjs: ssetBlock.AddItems BlockObjs
+    'MsgBox "line = " & ssetLines.Count & ", pline = " & ssetPolylines.Count _
+    & ", text = " & ssetMText.Count & ", block = " & ssetBlock.Count
+    
+    ThisDrawing.SelectionSets.Item("TEST_SSET").Delete
+    'ThisDrawing.SelectionSets.Item("TEST_SSET1").Delete
+    'ThisDrawing.SelectionSets.Item("TEST_SSET2").Delete
+    'ThisDrawing.SelectionSets.Item("TEST_SSET3").Delete
+    'ThisDrawing.SelectionSets.Item("TEST_SSET4").Delete
+End Sub

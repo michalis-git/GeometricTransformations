@@ -1,0 +1,55 @@
+Attribute VB_Name = "Mod_Polylines"
+Sub polylines(ssetPolylines)
+
+    'MsgBox "πλήθος πολυγραμμών = " & ssetPolylines.Count
+    
+    For Each entObj In ssetPolylines
+    polygrammes = polygrammes + 1
+    Dim retCoord As Variant
+    retCoord = entObj.Coordinates
+        For Each syntetagmenh In retCoord
+        metritis = metritis + 1
+        'MsgBox "syntetagmenh(" & Item & ") = " & syntetagmenh
+        Next
+        'MsgBox "metritis = " & metritis / 2
+        ReDim points(0 To metritis - 1) As Double
+        ReDim syntetagmenh_array(metritis)
+        i = 0
+        For Each syntetagmenh In retCoord
+        points(i) = syntetagmenh
+        i = i + 1
+        Next
+        
+        For i = 0 To metritis - 1 Step 2
+        Ax0 = points(i)
+        Ay0 = points(i + 1)
+        axtel = 0: aytel = 0
+    If index = "Similarity" Then
+        points(i) = xekt(1) + xekt(2) * Ax0 + xekt(3) * Ay0
+        points(i + 1) = xekt(4) + xekt(2) * Ay0 - xekt(3) * Ax0
+    Else
+        For j = 1 To met
+        axtel = xekt(j) * Ax0 ^ kr(j) * Ay0 ^ lr(j)
+        aytel = xekt(j + met) * Ax0 ^ kr(j) * Ay0 ^ lr(j)
+        Ax_tel = Ax_tel + axtel
+        Ay_tel = Ay_tel + aytel
+        Next j
+        points(i) = Ax_tel
+        points(i + 1) = Ay_tel
+        Ax_tel = 0: Ay_tel = 0
+    End If
+        Next i
+'        MsgBox "points(" & i & ") = " & points(i) & "points(" & i + 1 & ") = " & points(i + 1)
+        
+        Call chAddLayer
+        
+        Dim LWentObj As AcadLWPolyline
+        ' Create a lightweight Polyline object in model space
+        Set LWentObj = ThisDrawing.ModelSpace.AddLightWeightPolyline(points)
+        ZoomAll
+        metritis = 0
+    Next
+  
+
+'ThisDrawing.SelectionSets.Item("TEST_SSET2").Delete
+End Sub

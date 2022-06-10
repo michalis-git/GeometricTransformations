@@ -1,0 +1,6 @@
+Attribute VB_Name = "Mod_indexdim"
+Public index As String
+Sub index_dim()
+
+End Sub
+

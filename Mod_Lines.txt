@@ -1,0 +1,68 @@
+Attribute VB_Name = "Mod_Lines"
+Sub CLines(ssetLines)
+    Dim PtA As Variant
+    Dim PtB As Variant
+   Dim Ax0 As Double
+   Dim Ay0 As Double
+   Dim Bx0 As Double
+   Dim By0 As Double
+   Dim Ax_tel, Ay_tel, Bx_tel, By_tel As Variant
+   Dim axtel, aytel, bxtel, bytel As Variant
+   
+      ''''MsgBox grammes
+   ReDim AX(1 To grammes): ReDim AY(1 To grammes): ReDim BX(1 To grammes): ReDim BY(1 To grammes)
+
+      i = 0
+   For Each entObj In ssetLines
+    ' Find the start and endpoints for the line
+    PtA = entObj.startPoint
+    PtB = entObj.endPoint
+    ''''MsgBox "This line has a start point of " & PtA(0) & ", " & PtA(1) & ", " & PtA(2) & " and an endpoint of " & PtB(0) & ", " & PtB(1) & ", " & PtB(2), vbInformation, "StartPoint Example"
+    Ax0 = PtA(0): Ay0 = PtA(1): Bx0 = PtB(0): By0 = PtB(1)
+    axtel = 0: aytel = 0
+    
+    If index = "Similarity" Then
+        AX(i + 1) = xekt(1) + xekt(2) * Ax0 + xekt(3) * Ay0
+        AY(i + 1) = xekt(4) + xekt(2) * Ay0 - xekt(3) * Ax0
+        BX(i + 1) = xekt(1) + xekt(2) * Bx0 + xekt(3) * By0
+        BY(i + 1) = xekt(4) + xekt(2) * By0 - xekt(3) * Bx0
+    Else
+        For j = 1 To met
+        'MsgBox "xekt" & j & "=" & xekt(j)
+        axtel = xekt(j) * Ax0 ^ kr(j) * Ay0 ^ lr(j)
+        aytel = xekt(j + met) * Ax0 ^ kr(j) * Ay0 ^ lr(j)
+        bxtel = xekt(j) * Bx0 ^ kr(j) * By0 ^ lr(j)
+        bytel = xekt(j + met) * Bx0 ^ kr(j) * By0 ^ lr(j)
+        Ax_tel = Ax_tel + axtel
+        Ay_tel = Ay_tel + aytel
+        Bx_tel = Bx_tel + bxtel
+        By_tel = By_tel + bytel
+        Next j
+        AX(i + 1) = Ax_tel: AY(i + 1) = Ay_tel: BX(i + 1) = Bx_tel: BY(i + 1) = By_tel
+        Ax_tel = 0: Ay_tel = 0: Bx_tel = 0: By_tel = 0
+    End If
+        i = i + 1
+    Next
+
+    'For i = 1 To grammes
+        ''''MsgBox " the point is: " & AX(i) & ", " & AY(i) & ", " & BX(i) & ", " & BY(i)
+    'Next i
+
+    Call chAddLayer '(AX, AY, BX, BY)
+
+    Dim lineObj As AcadLine
+    For i = 1 To grammes
+        Dim startPoint(0 To 2) As Double
+        Dim endPoint(0 To 2) As Double
+        startPoint(0) = AX(i): startPoint(1) = AY(i): startPoint(2) = 0
+        endPoint(0) = BX(i): endPoint(1) = BY(i): endPoint(2) = 0
+
+        ' Create the line in model space
+        Set lineObj = ThisDrawing.ModelSpace.AddLine(startPoint, endPoint)
+        'MsgBox "nai1"
+        ZoomAll
+    
+        startPoint(1) = 0: startPoint(2) = 0: endPoint(1) = 0: endPoint(2) = 0
+    Next i
+   
+End Sub

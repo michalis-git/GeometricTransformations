@@ -1,0 +1,48 @@
+Attribute VB_Name = "Mod_EFARMOGH"
+Sub EFARMOGH(met, kr As Variant, lr As Variant, xekt As Variant)
+If vathmos > 1 Then
+    UserForm3.hide
+Else
+    UserForm2.hide
+End If
+
+   ' Prompt the user to select objects
+   ' and add them to the selection set.
+   ' To finish selecting, press ENTER.
+   
+Call ssets
+If polygrammes > 0 Then
+Call polylines(ssetPolylines)
+Else
+If keimena > 0 Then
+Call mtext(ssetMText)
+Else
+If symbola > 0 Then
+Call block(ssetBlock)
+Else
+If grammes > 0 Then
+Call CLines(ssetLines)
+Else
+End If: End If: End If: End If
+
+'ssetObj.Delete
+ssetLines.Delete
+ssetPolylines.Delete
+ssetMText.Delete
+ssetBlock.Delete
+
+If vathmos > 1 Then
+    UserForm3.Show
+Else
+    UserForm2.Show
+End If
+
+If vathmos > 1 Then
+    UserForm3.hide
+Else
+    UserForm2.hide
+End If
+
+'UserForm4.Show
+End Sub
+

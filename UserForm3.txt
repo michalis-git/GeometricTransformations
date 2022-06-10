@@ -1,0 +1,155 @@
+Dim EntryCount As Single
+Dim keywordList As String
+Dim returnPnt As Variant
+Dim returnPnt2 As Variant
+
+Private Sub CommandButton1_Click() 'KOYMPI ADD
+    EntryCount = EntryCount + 1
+    ListBox1.AddItem (EntryCount & ") " & TextBox1.Text)
+    ListBox2.AddItem (EntryCount & ") " & TextBox2.Text)
+End Sub
+
+Private Sub CommandButton2_Click() 'KOYMPI REMOVE
+    'Ensure ListBox contains list items
+    If ListBox1.ListCount >= 1 Then
+        'If no selection, choose last list item.
+        If ListBox1.ListIndex = -1 Then
+            ListBox1.ListIndex = _
+                    ListBox1.ListCount - 1
+        End If
+        ListBox1.RemoveItem (ListBox1.ListIndex)
+    End If
+    
+    'Ensure ListBox contains list items
+    If ListBox2.ListCount >= 1 Then
+        'If no selection, choose last list item.
+        If ListBox2.ListIndex = -1 Then
+            ListBox2.ListIndex = _
+                    ListBox2.ListCount - 1
+        End If
+        ListBox2.RemoveItem (ListBox2.ListIndex)
+    End If
+End Sub
+Private Sub CommandButton4_Click() 'KOYMPI "OK"
+    vathmos = TextBox4.Text
+    metr = 0
+    parameters = 0
+        For i = 1 To vathmos + 1
+        metr = metr + 1
+        parameters = parameters + metr
+        Next i
+    MsgBox parameters
+    Dim n1 As Integer
+'Dim i As Integer
+
+Dim f As Integer
+n1 = 0
+'ypologismos plh8oys zeygwn shmeiwn
+For f = 0 To ListBox1.ListCount - 1 'To 0 Step -1
+    n1 = n1 + 1
+Next f
+        Call transformation(parameters, vathmos, n1, ListBox1, ListBox2)
+End Sub
+
+Private Sub CommandButton5_Click() 'KOYMPI AKYRO
+Unload Me
+End Sub
+
+Private Sub CommandButton6_Click() 'KOYMPI XEIROKINHTA
+On Error Resume Next
+Frame2.Enabled = True
+Frame3.Enabled = True
+Frame4.Enabled = True
+ListBox1.Enabled = True
+ListBox2.Enabled = True
+UserForm3.hide
+Dim returnPnt As Variant
+Dim returnPnt2 As Variant
+EntryCount = 0
+
+   Dim Msg, Style, Title, Help, Ctxt, Response, MyString
+Msg = "Choose couple of points."    ' Define message.
+Style = vbYesNo    ' Define buttons.
+Title = " "    ' Define title.
+Help = "DEMO.HLP"    ' Define Help file.
+Ctxt = 1000    ' Define topic
+        ' context.
+        ' Display message.
+Response = MsgBox(Msg, Style, Title, Help, Ctxt)
+Do While Response = vbYes  ' User chose Yes.
+    MyString = "Yes"    ' Perform some action.
+EntryCount = EntryCount + 1
+       
+returnPnt = ThisDrawing.Utility.GetPoint(, "Input point")
+    If Err Then
+         If StrComp(Err.Description, "User input is a keyword", 1) = 0 Then
+         ' One of the keywords was entered
+             Dim inputString As String
+             Err.Clear
+             inputString = ThisDrawing.Utility.GetInput
+             MsgBox "You entered the keyword: " & inputString
+         Else
+             MsgBox "Error selecting the point: " & Err.Description
+             Err.Clear
+         End If
+    
+    End If
+ThisDrawing.ModelSpace.AddPoint returnPnt
+ThisDrawing.ModelSpace.AddText Str(EntryCount), returnPnt, 1
+ListBox1.AddItem (EntryCount & ")" & Str(returnPnt(0)) & "," & Str(returnPnt(1)))
+
+returnPnt = ThisDrawing.Utility.GetPoint(, "Input corresponding point")
+ThisDrawing.ModelSpace.AddPoint returnPnt
+ThisDrawing.ModelSpace.AddText Str(EntryCount), returnPnt, 1
+    If Err Then
+         If StrComp(Err.Description, "User input is a keyword", 1) = 0 Then
+         ' One of the keywords was entered
+             Err.Clear
+             inputString = ThisDrawing.Utility.GetInput
+             MsgBox "You entered the keyword: " & inputString
+         Else
+             MsgBox "Error selecting the point: " & Err.Description
+             Err.Clear
+         End If
+    
+    End If
+ListBox2.AddItem (EntryCount & ")" & Str(returnPnt(0)) & "," & Str(returnPnt(1)))
+Response = MsgBox(Msg, Style, Title, Help, Ctxt)
+If Response = vbNo Then
+ GoTo 10
+End If
+Loop ' User chose No.
+
+10:   UserForm3.Show
+End Sub
+
+
+Private Sub Label6_Click()
+
+End Sub
+
+Private Sub Label9_Click()
+
+End Sub
+
+Private Sub TextBox4_Change() 'vathmos polywnymoy
+    vathmos = TextBox4.Text
+    metr = 0
+    parameters = 0
+        For i = 1 To vathmos + 1
+        metr = metr + 1
+        parameters = parameters + metr
+        Next i
+Label7.Caption = "Select at least " & parameters & " couples of points."
+Label7.Enabled = True
+sigma_apriori = TextBox5.Text
+End Sub
+
+
+Private Sub TextBox6_Change()
+
+End Sub
+
+Private Sub UserForm_Click()
+
+End Sub

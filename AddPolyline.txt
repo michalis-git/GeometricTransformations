@@ -1,0 +1,40 @@
+Attribute VB_Name = "AddPolyline"
+Sub AddPolyline()
+AddLayer:
+    ' This example creates a new layer called "New_Layer"
+    Dim layerObj As AcadLayer
+    
+    ' Add the layer to the layers collection
+    Set layerObj = ThisDrawing.Layers.Add("New_Layer")
+    
+    ' Make the new layer the active layer for the drawing
+    ThisDrawing.ActiveLayer = layerObj
+    
+    ' Display the status of the new layer
+     MsgBox layerObj.Name & " has been added." & vbCrLf & _
+            "LayerOn Status: " & layerObj.LayerOn & vbCrLf & _
+            "Freeze Status: " & layerObj.Freeze & vbCrLf & _
+            "Lock Status: " & layerObj.Lock & vbCrLf & _
+            "Color: " & layerObj.color, , "Add Example"
+    'Return
+    
+    Dim lineObj As AcadPolyline
+    
+    'Dim startPoint(0 To 2) As Double
+    'Dim endPoint(0 To 2) As Double
+    Dim plineObj As AcadPolyline
+    Dim points(0 To 3 * kati) As Double
+    
+    For i = 1 To gr
+        For j = 0 To 3 * kati Step 3
+        ' Define the 2D polyline points
+        points(j) = AX(j)
+        points(j + 1) = AY(j)
+        points(j + 2) = 0
+        Next j
+    ' Create a lightweight Polyline object in model space
+    Set plineObj = ThisDrawing.ModelSpace.AddPolyline(points)
+    ZoomAll
+    points = 0
+    Next i
+End Sub

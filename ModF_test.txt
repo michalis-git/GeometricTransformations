@@ -1,0 +1,50 @@
+Attribute VB_Name = "ModF_test"
+Public F_test As Variant
+Public F_Fisher As Variant
+
+Sub FTEST(f As Variant, F_test As Variant)
+fel = Array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 24, 30, 40, 60, 120)
+fekat = Array(3.84, 3, 2.6, 2.37, 2.21, 2.1, 2.01, 1.94, 1.88, 1.83, 1.75, 1.67, 1.57, 1.52, 1.46, 1.39, 1.32, 1.22)
+
+'f = TextBox1.Text
+'f = Val(f)
+'MsgBox f & "ok!" & F_test & "ok!"
+
+For i = 0 To 17
+If fel(i) = f Then
+F_Fisher = fekat(i)
+Else
+End If
+Next i
+
+'MsgBox "f_fisher = " & F_Fisher
+
+If F_Fisher = Empty Then
+    For i = 0 To 16
+    If fel(i) < f And f < fel(i + 1) Then
+    fel1 = fel(i)
+    fekat1 = fekat(i)
+    metr2 = i
+    Else
+    End If
+    Next i
+
+
+    'MsgBox "fel1 = " & fel1 & "fekat1 = " & fekat1
+
+
+
+    'f_fisher = fekat1 + (fekat1 * f) / fel1
+    F_Fisher = fekat1 + (fekat(i) - fekat(i - 1)) * (f - fel1) / (fel(i) - fel1)
+    'MsgBox "f_fisher' = " & F_Fisher
+Else: End If
+
+If F_test < F_Fisher Then
+'Label7.Caption = "F_test" & "<" & "f_fisher"
+'Label8.Caption = "Αποδεκτός Ολικός Έλεγχος"
+Else
+'Label7.Caption = F_test & ">" & f_fisher
+'Label8.Caption = "Ο ολικός έλεγχος δεν έγινε δεκτός. Συνιστάται η επιλογή μετασχηματισμού ανώτερης τάξης."
+End If
+End Sub
+
