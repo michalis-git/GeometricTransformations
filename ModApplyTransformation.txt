@@ -1,145 +1,130 @@
 Attribute VB_Name = "ModTRANSFORMATION"
 Public inverse_N As Variant
 Public Transpose_A As Variant
-Public kr As Variant
-Public lr As Variant
-Public vathmos As Single
+Public kVector As Variant
+Public lVector As Variant
+Public polynomialDegree As Single
 Public parameters As Single
 Public apriori_s As Double
 Public sigma_aposteriori As Double
-Public feley8erias As Single
+Public degreesOfFreedom As Single
 Public numberOfPoints As Integer
-Public met As Integer
 Public b As Variant
 Public xekt As Variant
-Sub transformation(parameters2 As Single, vathmos As Single, n As Integer, ListBox1 As ListBox, ListBox2 As ListBox)
 
-If index = "Similarity" Then
-parameters2 = parameters2 / 2
-Else
-End If
+' points are of type: ' 1) 36.1565464, 28.545865156
+Function xForIndexFromListBox(i As Integer, listBox As ListBox) As Long
+    Dim x As Long
+    Dim itemText As String
+    Dim xString As String
+    Dim startPos As Integer, commaPos As Integer
+    itemText = ListBox.List(i)
+    startPos = InStr(itemText, ")")
+    commaPos = InStr(itemText, ",")
+    xString = VBA.Mid(itemText, startPos + 1, commaPos - 3)
+    x = Val(xString)
+End Function
 
-feley8erias = 2 * n - (2 * parameters2)
-'MsgBox "f =" & feley8erias
-If feley8erias < 0 Then
-MsgBox "Solution is not possible."
-Else
-'MsgBox "mix" & parameters2
-Dim getitemtext As String
-Dim xnumb As Single
+Function yForIndexFromListBox(i As Integer, listBox As ListBox) As Long
+    Dim y As Long
+    Dim itemText As String
+    Dim yString As String
+    Dim startPos As Integer, commaPos As Integer
+    itemText = ListBox.List(i)
+    commaPos = InStr(itemText, ",")
+    yString = VBA.Mid(itemText, commaPos + 1)
+    y = Val(yString)
+End Function
+
+Sub transformation(polynomialDegree As Single, numberOfPoints As Integer, basePointListBox As ListBox, ListBox2 As ListBox)
+
+    degreesOfFreedom = 2 * numberOfPoints - 2 
+    If degreesOfFreedom < 0 Then
+        MsgBox "Solution is not possible."
+    End If
+
+
+Dim xBasePoint As Single
 Dim ynumb As Single
 Dim x As String
 Dim y As String
 
-Dim Xprnumb As Single
-Dim Yprnumb As Single
+Dim xReferencePoint As Single
+Dim yReferencePoint As Single
 Dim Xpr
 Dim Ypr
 Dim k As Single
 Dim l As Single
 
 'dhlwsh pinakwn A kai b
-'ReDim A(1 To 2 * n, 1 To 2 * parameters2) As Variant
 ReDim b(1 To 2 * n)
-ReDim kr(1 To parameters2)
-ReDim lr(1 To parameters2)
+
 ReDim xvect(1 To n) As Variant
 ReDim yvect(1 To n) As Variant
 
+
+' Populates k and l vectors. These vectors contain the powers 
+' of each parameter of the polynomial (or of the paramters of the X, Y equations)
+ReDim kVector(0 To numberOfPoints-1)
+ReDim lVector(0 To numberOfPoints-1)
 If index = "Bilinear" Then 'GIA DIGRAMMIKO
-    ReDim kr(0 To parameters2)
-    ReDim lr(0 To parameters2)
-    kr = Array(0, 0, 1, 0, 1)  'ena parapanw stoixeio sthn arxh gt stoys arrays
-    lr = Array(0, 0, 0, 1, 1) ' to index 3ekinaei apo to 0
-    met = 4
+    kVector = Array(0, 1, 0, 1)
+    lVector = Array(0, 0, 1, 1)
 Else
-    'dhmioyrgei 2 dianysmata pou periexoun toys ek8etes
-    'gia ton algori8mo twn stoixeiwn toy A
-    ReDim kr(1 To parameters2)
-    ReDim lr(1 To parameters2)
-    met = 0
-    For k = 0 To vathmos
+    For k = 0 To polynomialDegree
         For l = 0 To k
-            met = met + 1
-            kr(met) = k - l
-            lr(met) = l
-            'MsgBox kr(met) & ", " & lr(met)
+            kVector(k) = k - l
+            lVector(k) = l
         Next l
     Next k
 End If
 
-'typwnei ta dianysmata kr(i) kai lr(i)
-Dim i As Integer
-Open "c:\temp\kr.txt" For Output As #3
-For i = 1 To parameters2
-''''MsgBox "kr" & kr(i)
-    Print #3, kr(i),
-Next i
-Close #3
 
 'dhmioyrgei 2 dianysmata me tis yimes twn xi kai yi
 'gia ton algori8mo twn stoixeiwn toy A
-Dim themis As Variant
-Dim THEMIS1 As Variant
-Dim THEMIS2 As Variant
-Dim themis3 As Variant
-For i = 0 To ListBox1.ListCount - 1
-    'lhpsh x synt/nhs
-    getitemtext = ListBox1.List(i)
-    themis = InStr(getitemtext, ")")
-    THEMIS1 = InStr(getitemtext, ",")
-    x = VBA.Mid(getitemtext, themis + 1, THEMIS1 - 3)
-    xnumb = Val(x)
-    'lhpsh y synt/nhs
-    y = VBA.Mid(getitemtext, THEMIS1 + 1)
-    'MsgBox x & "and" & y
-    ynumb = Val(y)
-    'MsgBox xnumb & "and" & ynumb
-    'lhpsh X (provolikhs) synt/nhs
-    getitemtext = ListBox2.List(i)
-    THEMIS2 = InStr(getitemtext, ")")
-    themis3 = InStr(getitemtext, ",")
-    Xpr = VBA.Mid(getitemtext, THEMIS2 + 1, themis3 - 3)
-    Xprnumb = Val(Xpr)
-    'lhpsh Y (probolikhs) synt/nhs
-    Ypr = VBA.Mid(getitemtext, themis3 + 1)
-    Yprnumb = Val(Ypr)
-    
+
+For i = 0 To basePointListBox.ListCount - 1
+    ' get x, y of base point
+    xBasePoint = xForIndexFromListBox(i, basePointListBox)
+    yBasePoint  = yForIndexFromListBox(i, basePointListBox)
+
+    ' get x, y of reference point
+    xReferencePoint = xForIndexFromListBox(i, referencePointListBox)
+    yReferencePoint = yForIndexFromListBox(i, referencePointListBox)
+
     'CREATE b
-    b(i + 1) = Xprnumb
-    b(i + n + 1) = Yprnumb
+    b(i + 1) = xReferencePoint
+    b(i + n + 1) = yReferencePoint
 
     'CREATE A
-    xvect(i + 1) = xnumb
-    yvect(i + 1) = ynumb
-    ''''MsgBox "kanonika:" & x & ", " & y & ", " & Xpr & ", " & Ypr
-    'MsgBox "me str:" & xnumb & ", " & ynumb & ", " & Xprnumb & ", " & Yprnumb
+    xvect(i + 1) = xBasePoint
+    yvect(i + 1) = yBasePoint
 Next i
 
 If index = "Similarity" Then
 'Dim a2dim As Integer
-'a2dim = 2 * parameters2
-ReDim A(1 To 2 * n, 1 To 2 * parameters2) As Variant
+'a2dim = 2 * numberOfPoints
+ReDim A(1 To 2 * n, 1 To 2 * numberOfPoints) As Variant
 'ReDim A(2 * n, a2dim)  'As Variant
-Call A_OMOIOTHTAS(parameters2, A, n)
+Call A_OMOIOTHTAS(numberOfPoints, A, n)
 Else
-    ReDim amikros(1 To n, 1 To parameters2) As Variant
-    'yplogigei ena tmhma tou PINAKA SXEDIASMOU, to pinaka amikros
+    ReDim amikVectoros(1 To n, 1 To numberOfPoints) As Variant
+    'yplogigei ena tmhma tou PINAKA SXEDIASMOU, to pinaka amikVectoros
     For i = 1 To n
-        For j = 1 To met
-        amikros(i, j) = xvect(i) ^ kr(j) * yvect(i) ^ lr(j)
-        ''''MsgBox "j = " & j & " kr(j) " & kr(j) & "   lr(j) " & lr(j)
+        For j = 1 To UBound(kVector)
+        amikVectoros(i, j) = xvect(i) ^ kVector(j) * yvect(i) ^ lVector(j)
+        ''''MsgBox "j = " & j & " kVector(j) " & kVector(j) & "   lVector(j) " & lVector(j)
         Next j
     Next i
     'yplogigei ton PINAKA SXEDIASMOU A
-    ReDim A(1 To 2 * n, 1 To 2 * parameters2) As Variant
+    ReDim A(1 To 2 * n, 1 To 2 * numberOfPoints) As Variant
     For i = 1 To 2 * n
-        For j = 1 To 2 * parameters2
-        If i <= n And j <= parameters2 Then
-        A(i, j) = amikros(i, j)
+        For j = 1 To 2 * numberOfPoints
+        If i <= n And j <= numberOfPoints Then
+        A(i, j) = amikVectoros(i, j)
         Else
-        If (n + 1) <= i And (parameters2 + 1) <= j Then
-        A(i, j) = amikros(i - n, j - parameters2)
+        If (n + 1) <= i And (numberOfPoints + 1) <= j Then
+        A(i, j) = amikVectoros(i - n, j - numberOfPoints)
         Else: A(i, j) = 0
         End If
         End If
@@ -149,7 +134,7 @@ Else
     'typwnei ton A
     Open "c:\temp\pinakasA.txt" For Output As #1
     For i = 1 To 2 * n
-        For j = 1 To 2 * parameters2
+        For j = 1 To 2 * numberOfPoints
         Print #1, A(i, j),
         Next j
         Print #1,    ' Print blank line to file.
@@ -164,10 +149,6 @@ For i = 1 To 2 * n
 Next i
 Close #3
 
-'sayto to shmeio vgainei enas dialogos pou rwtaei an o xrhsths
-'epi8ymei na eisagei kapoies symmetavlhtothtes
-   'Dim Msg, Style, Title, Help, Ctxt, Response, MyString
-
 'dhmioyrgei dokimastika ton P
 'pinaka varwn
 ReDim P(1 To 2 * n, 1 To 2 * n) As Variant
@@ -181,56 +162,28 @@ For i = 1 To 2 * n
     Next j
 Next i
 
-'typwnei ton P
-Open "c:\temp\P.txt" For Output As #10
-For i = 1 To 2 * n
-    For j = 1 To 2 * n
-    Print #10, P(i, j),
-    Next j
-    Print #10,    ' Print blank line to file.
-Next i
-Close #10
-
 'TRANSPOSE MATRIX
-ReDim Transpose_A(1 To 2 * parameters2, 1 To 2 * n) As Variant
-Call TransposeMatrix(parameters2, A, n)
-
-Open "c:\temp\Transpose_A.txt" For Output As #2  'prints Transpose_A
-For i = 1 To 2 * parameters2
-    For j = 1 To 2 * n
-    Print #2, Transpose_A(i, j),
-    Next j
-    Print #2,    ' Print blank line to file.
-Next i
-Close #2
+ReDim Transpose_A(1 To 2 * numberOfPoints, 1 To 2 * n) As Variant
+Call TransposeMatrix(numberOfPoints, A, n)
 
 'Calculates the product [A]*[A-1] which must be always equal to the Singular Matrix [I]
 'The same result must also come up for the product: [A-1]*[A]=[I]
 'You can try it using: Matrix_Mult(k, m) = Matrix_Mult(k, m) + Inverse_Matrix(L, m) * Matrix_A(k, L)
 
 'MULTIPLICATION TRANSPOSE_A * P (=AT*P)
-ReDim ATP(1 To 2 * parameters2, 1 To 2 * n)
-For k = 1 To 2 * parameters2
+ReDim ATP(1 To 2 * numberOfPoints, 1 To 2 * n)
+For k = 1 To 2 * numberOfPoints
     For m = 1 To 2 * n
         ATP(k, m) = ATP(k, m) + Transpose_A(k, m) * P(m, m)
     Next m
 Next k
 
-Open "c:\temp\ATP.txt" For Output As #11  'Prints ATP
-For i = 1 To 2 * parameters2
-    For j = 1 To 2 * n
-    Print #11, ATP(i, j),
-    Next j
-    Print #11,    ' Print blank line to file.
-Next i
-Close #11
-
 
 'PINAKES KANONIKWN E3ISWSEWN (N KAI u)
 'N = TRANSPOSE_A * P * A
-ReDim Nmat(1 To 2 * parameters2, 1 To 2 * parameters2)
-For k = 1 To 2 * parameters2
-    For m = 1 To 2 * parameters2
+ReDim Nmat(1 To 2 * numberOfPoints, 1 To 2 * numberOfPoints)
+For k = 1 To 2 * numberOfPoints
+    For m = 1 To 2 * numberOfPoints
         For l = 1 To 2 * n
             Nmat(k, m) = Nmat(k, m) + ATP(k, l) * A(l, m)
         Next l
@@ -238,33 +191,33 @@ For k = 1 To 2 * parameters2
 Next k
 'typwnei ton N
 Open "c:\temp\Nmat.txt" For Output As #12
-For i = 1 To 2 * parameters2
-    For j = 1 To 2 * parameters2
+For i = 1 To 2 * numberOfPoints
+    For j = 1 To 2 * numberOfPoints
     Print #12, Nmat(i, j),
     Next j
     Print #12,    ' Print blank line to file.
 Next i
 Close #12
 
-ReDim u(1 To 2 * parameters2) As Variant
-For k = 1 To 2 * parameters2
+ReDim u(1 To 2 * numberOfPoints) As Variant
+For k = 1 To 2 * numberOfPoints
         For l = 1 To 2 * n
             u(k) = u(k) + ATP(k, l) * b(l)
         Next l
 Next k
 'typwnei ton u
 Open "c:\temp\u.txt" For Output As #13
-For i = 1 To 2 * parameters2
+For i = 1 To 2 * numberOfPoints
     Print #13, u(i),
 Next i
 Close #13
 
-ReDim inverse_N(1 To 2 * parameters2, 1 To 2 * parameters2) As Variant
-Call Inverse_Table(parameters2, Nmat) ', inverse_N)
+ReDim inverse_N(1 To 2 * numberOfPoints, 1 To 2 * numberOfPoints) As Variant
+Call Inverse_Table(numberOfPoints, Nmat) ', inverse_N)
 
 Open "c:\temp\Inverse_N.txt" For Output As #14
-For i = 1 To 2 * parameters2
-    For j = 1 To 2 * parameters2
+For i = 1 To 2 * numberOfPoints
+    For j = 1 To 2 * numberOfPoints
     
     Print #14, inverse_N(i, j),
     Next j
@@ -272,22 +225,22 @@ For i = 1 To 2 * parameters2
 Next i
 Close #14
 
-ReDim xekt(1 To 2 * parameters2)
-For k = 1 To 2 * parameters2
-        For l = 1 To 2 * parameters2
+ReDim xekt(1 To 2 * numberOfPoints)
+For k = 1 To 2 * numberOfPoints
+        For l = 1 To 2 * numberOfPoints
             xekt(k) = xekt(k) + inverse_N(k, l) * u(l)
         Next l
 Next k
 'typwnei ton xekt (ektimiseis parametrwn)
 Open "c:\temp\xekt.txt" For Output As #15
-For i = 1 To 2 * parameters2
+For i = 1 To 2 * numberOfPoints
     Print #15, xekt(i),
 Next i
 Close #15
 
 ReDim AX_mat(1 To 2 * n)
 For k = 1 To 2 * n
-        For l = 1 To 2 * parameters2
+        For l = 1 To 2 * numberOfPoints
             AX_mat(k) = AX_mat(k) + A(k, l) * xekt(l)
         Next l
 Next k
@@ -297,34 +250,7 @@ For i = 1 To 2 * n
     v(i) = b(i) - AX_mat(i)
 Next i
 
-Open "c:\temp\v.txt" For Output As #16
-For i = 1 To 2 * n
-    Print #16, v(i),
-Next i
-Close #16
-
-'ReDim vP(2 * n To 2 * n)
-'For k = 1 To 2 * n
-        'For l = 1 To 2 * n
-            'vP(k) = vP(k) + v(k) * P(k, l)
-        'Next l
-'Next k
-
-'ReDim v2(1 To 2 * n)
-'For k = 1 To 2 * n
-        'For l = 1 To 2 * n
-            'v2(k) = v2(k) + vP(k, l) * v(l)
-        'Next l
-'Next k
-
-'Open "c:\v.txt" For Output As #17
-'For i = 1 To 2 * n
-    'Print #17, v2(i),
-'Next i
-'Close #17
-
-
-If feley8erias = 0 Then
+If degreesOfFreedom = 0 Then
 MsgBox "Solution without least square method application."
 Else
 'Dim sigma_aposteriori As Double
@@ -332,11 +258,11 @@ For i = 1 To 2 * n
   stoixeio = v(i) ^ 2
   Sstoixeio = Sstoixeio + stoixeio
 Next i
-sigma_aposteriori = Sstoixeio / feley8erias
+sigma_aposteriori = Sstoixeio / degreesOfFreedom
 F_test = sigma_aposteriori / apriori_s
 'MsgBox F_test
 
-Call FTEST(feley8erias, F_test)
+Call FTEST(degreesOfFreedom, F_test)
 End If
 End If
 

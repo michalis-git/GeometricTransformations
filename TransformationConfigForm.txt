@@ -98,7 +98,7 @@ Private Sub okButton_Click()
 
     apriori_s = sAprioriTextBox.Text
 
-    Call transformation(parameters, vathmos, numberOfPoints, basePointsListBox, referencePointsListBox)
+    Call transformation(vathmos, numberOfPoints, basePointsListBox, referencePointsListBox)
 
     UserForm4_Report.Show
 End Sub
