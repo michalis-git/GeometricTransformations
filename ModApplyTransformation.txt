@@ -5,10 +5,10 @@ Public kr As Variant
 Public lr As Variant
 Public vathmos As Single
 Public parameters As Single
-Public sigma_apriori As Double
+Public apriori_s As Double
 Public sigma_aposteriori As Double
 Public feley8erias As Single
-Public n1 As Integer
+Public numberOfPoints As Integer
 Public met As Integer
 Public b As Variant
 Public xekt As Variant
@@ -204,6 +204,10 @@ For i = 1 To 2 * parameters2
 Next i
 Close #2
 
+'Calculates the product [A]*[A-1] which must be always equal to the Singular Matrix [I]
+'The same result must also come up for the product: [A-1]*[A]=[I]
+'You can try it using: Matrix_Mult(k, m) = Matrix_Mult(k, m) + Inverse_Matrix(L, m) * Matrix_A(k, L)
+
 'MULTIPLICATION TRANSPOSE_A * P (=AT*P)
 ReDim ATP(1 To 2 * parameters2, 1 To 2 * n)
 For k = 1 To 2 * parameters2
@@ -329,7 +333,7 @@ For i = 1 To 2 * n
   Sstoixeio = Sstoixeio + stoixeio
 Next i
 sigma_aposteriori = Sstoixeio / feley8erias
-F_test = sigma_aposteriori / sigma_apriori
+F_test = sigma_aposteriori / apriori_s
 'MsgBox F_test
 
 Call FTEST(feley8erias, F_test)
