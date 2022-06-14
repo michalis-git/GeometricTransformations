@@ -1,11 +1,11 @@
 Attribute VB_Name = "ModResiduals"
+
 Public Dx, Dy, sse, xvect, yvect As Variant
 Public nn As Integer
 Sub residual(xvect As Variant, yvect As Variant, xekt As Variant, n As Integer)
-nn = n
-   Dim Ax_tel, Ay_tel, axtel, aytel As Variant
-   Dim gr As Integer
-   ''''MsgBox gr
+    nn = n
+    Dim Ax_tel, Ay_tel, axtel, aytel As Variant
+
     ReDim Dx(1 To n)
     ReDim Dy(1 To n)
     ReDim sse(1 To n)
@@ -13,47 +13,28 @@ nn = n
     Ay_tel = 0
     
     For i = 1 To n
+        axtel = 0: aytel = 0
     
-    axtel = 0: aytel = 0
-    'A_tel(x,y) kai B_tel(x,y)
-    
-If index = "Ομοιότητας" Then
-    Ax_tel = xekt(1) + xekt(2) * xvect(i) + xekt(3) * yvect(i)
-    Ay_tel = xekt(4) + xekt(2) * yvect(i) - xekt(3) * xvect(i)
-Else
-    For j = 1 To met
-    axtel = xekt(j) * xvect(i) ^ kr(j) * yvect(i) ^ lr(j)
-    aytel = xekt(j + met) * xvect(i) ^ kr(j) * yvect(i) ^ lr(j)
-    Ax_tel = Ax_tel + axtel
-    Ay_tel = Ay_tel + aytel
-    
-    Next j
-End If
-        'Dx(i) = Ax_tel - xvect(i)
-        'Dy(i) = Ay_tel - yvect(i)
+        If index = "Similarity" Then
+            Ax_tel = xekt(1) + xekt(2) * xvect(i) + xekt(3) * yvect(i)
+            Ay_tel = xekt(4) + xekt(2) * yvect(i) - xekt(3) * xvect(i)
+        Else
+            For j = 1 To met
+                axtel = xekt(j) * xvect(i) ^ kr(j) * yvect(i) ^ lr(j)
+                aytel = xekt(j + met) * xvect(i) ^ kr(j) * yvect(i) ^ lr(j)
+                Ax_tel = Ax_tel + axtel
+                Ay_tel = Ay_tel + aytel
+            Next j
+        End If
+
         Dx(i) = Ax_tel - b(i)
         Dy(i) = Ay_tel - b(n + i)
         sse(i) = Sqr(Dx(i) ^ 2 + Dy(i) ^ 2)
         Ax_tel = 0
         Ay_tel = 0
-        'i = i + 1
     Next i
 
 
-Ax_tel = 0: Ay_tel = 0: axtel = 0: aytel = 0: gr = 0
-
-'typwnei ton Dx
-Open "c:\temp\Dx.txt" For Output As #70
-For i = 1 To n
-    Print #70, Dx(i),
-Next i
-Close #70
-
-'typwnei ton Dx
-Open "c:\temp\Dy.txt" For Output As #71
-For i = 1 To n
-    Print #71, Dy(i),
-Next i
-Close #71
+    Ax_tel = 0: Ay_tel = 0: axtel = 0: aytel = 0: gr = 0
 
 End Sub

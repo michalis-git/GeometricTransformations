@@ -1,32 +1,5 @@
 Attribute VB_Name = "ModINVERSE"
 Sub Inverse_Table(parameters1 As Single, Nmat1 As Variant)
-'2 * 2*parameters1 = 5 '4
-'ReDim Nmat1(1 To 2 * 2*parameters1, 1 To 2 * 2*parameters1)
-'Nmat1(1, 1) = 1
-'Nmat1(1, 2) = 2
-'Nmat1(1, 3) = 3
-'Nmat1(1, 4) = 4
-'Nmat1(1, 5) = 12
-'Nmat1(2, 1) = 2
-'Nmat1(2, 2) = 5
-'Nmat1(2, 3) = 4
-'Nmat1(2, 4) = 4
-'Nmat1(2, 5) = 10
-'Nmat1(3, 1) = 3
-'Nmat1(3, 2) = 4
-'Nmat1(3, 3) = 14
-'Nmat1(3, 5) = 8
-'Nmat1(3, 4) = 15
-'Nmat1(4, 1) = 4
-'Nmat1(4, 2) = 4
-'Nmat1(4, 3) = 15
-'Nmat1(4, 4) = 18
-'Nmat1(4, 5) = 16
-'Nmat1(5, 1) = 12
-'Nmat1(5, 2) = 10
-'Nmat1(5, 3) = 8
-'Nmat1(5, 4) = 16
-'Nmat1(5, 5) = 19
 
 'Open "c:\Nmat_Cholesky.txt" For Output As #102
 'For i = 1 To 2 * 2*parameters1
