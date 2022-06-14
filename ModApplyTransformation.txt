@@ -57,10 +57,10 @@ Dim k As Single
 Dim l As Single
 
 'dhlwsh pinakwn A kai b
-ReDim b(1 To 2 * n)
+ReDim b(1 To 2 * numberOfPoints)
 
-ReDim xvect(1 To n) As Variant
-ReDim yvect(1 To n) As Variant
+ReDim xvect(0 To numberOfPoints-1) As Variant
+ReDim yvect(0 To numberOfPoints-1) As Variant
 
 
 ' Populates k and l vectors. These vectors contain the powers 
@@ -93,27 +93,23 @@ For i = 0 To basePointListBox.ListCount - 1
     yReferencePoint = yForIndexFromListBox(i, referencePointListBox)
 
     'CREATE b
-    b(i + 1) = xReferencePoint
-    b(i + n + 1) = yReferencePoint
+    b(i) = xReferencePoint
+    b(i + n) = yReferencePoint
 
     'CREATE A
-    xvect(i + 1) = xBasePoint
-    yvect(i + 1) = yBasePoint
+    xvect(i) = xBasePoint
+    yvect(i) = yBasePoint
 Next i
 
 If index = "Similarity" Then
-'Dim a2dim As Integer
-'a2dim = 2 * numberOfPoints
-ReDim A(1 To 2 * n, 1 To 2 * numberOfPoints) As Variant
-'ReDim A(2 * n, a2dim)  'As Variant
-Call A_OMOIOTHTAS(numberOfPoints, A, n)
+    ReDim A(1 To 2 * n, 1 To 2 * numberOfPoints) As Variant
+    Call A_OMOIOTHTAS(numberOfPoints, A, n)
 Else
-    ReDim amikVectoros(1 To n, 1 To numberOfPoints) As Variant
-    'yplogigei ena tmhma tou PINAKA SXEDIASMOU, to pinaka amikVectoros
+    ReDim amikros(1 To n, 1 To numberOfPoints) As Variant
+    'yplogigei ena tmhma tou PINAKA SXEDIASMOU, to pinaka amikros
     For i = 1 To n
         For j = 1 To UBound(kVector)
-        amikVectoros(i, j) = xvect(i) ^ kVector(j) * yvect(i) ^ lVector(j)
-        ''''MsgBox "j = " & j & " kVector(j) " & kVector(j) & "   lVector(j) " & lVector(j)
+        amikros(i, j) = xvect(i) ^ kVector(j) * yvect(i) ^ lVector(j)
         Next j
     Next i
     'yplogigei ton PINAKA SXEDIASMOU A
@@ -121,33 +117,18 @@ Else
     For i = 1 To 2 * n
         For j = 1 To 2 * numberOfPoints
         If i <= n And j <= numberOfPoints Then
-        A(i, j) = amikVectoros(i, j)
+        A(i, j) = amikros(i, j)
         Else
         If (n + 1) <= i And (numberOfPoints + 1) <= j Then
-        A(i, j) = amikVectoros(i - n, j - numberOfPoints)
+        A(i, j) = amikros(i - n, j - numberOfPoints)
         Else: A(i, j) = 0
         End If
         End If
         Next j
     Next i
 
-    'typwnei ton A
-    Open "c:\temp\pinakasA.txt" For Output As #1
-    For i = 1 To 2 * n
-        For j = 1 To 2 * numberOfPoints
-        Print #1, A(i, j),
-        Next j
-        Print #1,    ' Print blank line to file.
-    Next i
-    Close #1
 End If
 
-'typwnei ton b
-Open "c:\temp\pinakasb.txt" For Output As #3
-For i = 1 To 2 * n
-    Print #3, b(i)
-Next i
-Close #3
 
 'dhmioyrgei dokimastika ton P
 'pinaka varwn
