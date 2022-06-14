@@ -1,84 +1,55 @@
 Attribute VB_Name = "Mod_A_Omoiothtas"
-Sub A_OMOIOTHTAS(parameters4, A4, n4)
-parameters4 = parameters4 * 2
-ReDim amikros1(1 To n4, 1 To parameters4) As Variant
-'yplogigei ena tmhma tou PINAKA SXEDIASMOU, ton pinaka amikros1
-For j = 1 To parameters4
-    For i = 1 To n4
-    If j = 1 Then
-    amikros1(i, j) = 1
-    Else
-    If j = 2 Then
-    amikros1(i, j) = xvect(i)
-    Else
-    If j = 3 Then
-    amikros1(i, j) = yvect(i)
-    Else
-    amikros1(i, j) = 0
-    End If
-    End If
-    End If
+Sub A_OMOIOTHTAS(numberOfPoints, A4, numberOfPoints)
+numberOfPoints = numberOfPoints * 2
+
+' 1st part of design matrix A
+
+ReDim firstPartOfA(0 To numberOfPoints-1, 0 To numberOfPoints-1) As Variant
+For j = 0 To numberOfPoints-1
+    For i = 0 To numberOfPoints-1
+        If j = 0 Then
+            firstPartOfA(i, j) = 1
+        ElseIf j = 1 Then
+            firstPartOfA(i, j) = xvect(i)
+        ElseIf j = 2 Then
+            firstPartOfA(i, j) = yvect(i)
+        Else
+            firstPartOfA(i, j) = 0
+        End If
     Next i
 Next j
 
-Open "c:\temp\amikros1.txt" For Output As #111
-For i = 1 To n4
-    For j = 1 To parameters4
-    Print #111, amikros1(i, j),
-    Next j
-    Print #111,    ' Print blank line to file.
-Next i
-Close #111
 
-ReDim amikros2(1 To n4, 1 To parameters4) As Variant
-'yplogigei ena  allo tmhma tou PINAKA SXEDIASMOU, ton pinaka amikros2
-For j = 1 To parameters4
-    For i = 1 To n4
-    If j = 1 Then
-    amikros2(i, j) = 0
-    Else
-    If j = 2 Then
-    amikros2(i, j) = yvect(i)
-    Else
-    If j = 3 Then
-    amikros2(i, j) = -xvect(i)
-    Else
-    amikros2(i, j) = 1
-    End If
-    End If
-    End If
+'yplogigei ena  allo tmhma tou PINAKA SXEDIASMOU, ton pinaka secondPartOfA
+ReDim secondPartOfA(1 To numberOfPoints, 1 To numberOfPoints) As Variant
+For j = 0 To numberOfPoints-1
+    For i = 0 To numberOfPoints-1
+        If j = 0 Then
+            secondPartOfA(i, j) = 0
+        ElseIf j = 1 Then
+            secondPartOfA(i, j) = yvect(i)
+        ElseIf j = 2 Then
+            secondPartOfA(i, j) = -xvect(i)
+        Else
+            secondPartOfA(i, j) = 1
+        End If
     Next i
 Next j
  
-Open "c:\temp\amikros2.txt" For Output As #112
-For i = 1 To n4
-    For j = 1 To parameters4
-    Print #112, amikros2(i, j),
-    Next j
-    Print #112,    ' Print blank line to file.
-Next i
-Close #112
+
  
-ReDim A4(1 To 2 * n4, 1 To parameters4) As Variant
+ReDim A(0 To 2 * numberOfPoints -1), 1 To numberOfPoints - 1) As Variant
 'yplogigei ton PINAKA SXEDIASMOU A
-For i = 1 To 2 * n4
-    For j = 1 To parameters4
-    If i <= n4 Then
-    A4(i, j) = amikros1(i, j)
-    Else
-    A4(i, j) = amikros2(i - n4, j)
-    End If
+For i = 0 To 2 * numberOfPoints-1
+    For j = 0 To numberOfPoints-1
+        If i <= numberOfPoints Then
+            A(i, j) = firstPartOfA(i, j)
+        Else
+            A(i, j) = secondPartOfA(i - numberOfPoints, j)
+        End If
     Next j
 Next i
 
-'typwnei ton A
-Open "c:\temp\pinakasA.txt" For Output As #71
-For i = 1 To 2 * n4
-    For j = 1 To parameters4
-    Print #71, A4(i, j),
-    Next j
-    Print #71,    ' Print blank line to file.
-Next i
-Close #71
-parameters4 = parameters4 / 2
+
+numberOfPoints = numberOfPoints / 2
 End Sub
