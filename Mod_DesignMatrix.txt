@@ -1,0 +1,77 @@
+Attribute VB_Name = "Mod_DesignMatrixA"
+Sub DesignMatrixA(index, numberOfPoints, A)
+
+    numberOfPoints = numberOfPoints * 2
+
+    If (index == "Similarity") Then
+        ' 1st part of design matrix A
+        ReDim firstPartOfA(0 To numberOfPoints-1, 0 To numberOfPoints-1) As Variant
+        For j = 0 To numberOfPoints-1
+            For i = 0 To numberOfPoints-1
+                If j = 0 Then
+                    firstPartOfA(i, j) = 1
+                ElseIf j = 1 Then
+                    firstPartOfA(i, j) = xvect(i)
+                ElseIf j = 2 Then
+                    firstPartOfA(i, j) = yvect(i)
+                Else
+                    firstPartOfA(i, j) = 0
+                End If
+            Next i
+        Next j
+
+
+        ' 2nd part of design matrix A
+        ReDim secondPartOfA(1 To numberOfPoints, 1 To numberOfPoints-1) As Variant
+        For j = 0 To numberOfPoints-1
+            For i = 0 To numberOfPoints-1
+                If j = 0 Then
+                    secondPartOfA(i, j) = 0
+                ElseIf j = 1 Then
+                    secondPartOfA(i, j) = yvect(i)
+                ElseIf j = 2 Then
+                    secondPartOfA(i, j) = -xvect(i)
+                Else
+                    secondPartOfA(i, j) = 1
+                End If
+            Next i
+        Next j
+         
+
+        ' Combines two matrices to create Design Matrix A 
+        ReDim A(0 To 2 * numberOfPoints -1), 0 To numberOfPoints - 1) As Variant
+        'yplogigei ton PINAKA SXEDIASMOU A
+        For i = 0 To 2 * numberOfPoints-1
+            For j = 0 To numberOfPoints-1
+                If i <= numberOfPoints Then
+                    A(i, j) = firstPartOfA(i, j)
+                Else
+                    A(i, j) = secondPartOfA(i - numberOfPoints, j)
+                End If
+            Next j
+        Next i
+    Else
+        ' 1st part of design matrix A
+        ReDim partOfA(0 To numberOfPoints-1, 0 To numberOfPoints-1) As Variant
+        For i = 0 To numberOfPoints-1
+            For j = 1 To UBound(kVector)
+                partOfA(i, j) = xvect(i) ^ kVector(j) * yvect(i) ^ lVector(j)
+            Next j
+        Next i
+
+        ' Populates Design Matrix A
+        ReDim A(0 To 2 * numberOfPoints-1, 0 To 2 * numberOfPoints-1) As Variant
+        For i = 0 To 2 * numberOfPoints-1
+            For j = 0 To 2 * numberOfPoints-1
+                If i <= n And j <= numberOfPoints-1 Then
+                    A(i, j) = partOfA(i, j)
+                ElseIf (numberOfPoints <= i) And (numberOfPoints <= j) Then
+                    A(i, j) = partOfA(i - numberOfPoints, j - numberOfPoints)
+                Else
+                    A(i, j) = 0
+                End If
+            Next j
+        Next i
+    End If
+
+End Sub
