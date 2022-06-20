@@ -2,39 +2,39 @@ Attribute VB_Name = "ModResiduals"
 
 Public Dx, Dy, sse, xvect, yvect As Variant
 Public nn As Integer
-Sub residual(xvect As Variant, yvect As Variant, xekt As Variant, n As Integer)
+Sub residual(xvect As Variant, yvect As Variant, xEstimation As Variant, n As Integer)
     nn = n
-    Dim Ax_tel, Ay_tel, axtel, aytel As Variant
+    Dim AxFinal, AyFinal, Ax, Ay As Variant
 
     ReDim Dx(1 To n)
     ReDim Dy(1 To n)
     ReDim sse(1 To n)
-    Ax_tel = 0
-    Ay_tel = 0
+    AxFinal = 0
+    AyFinal = 0
     
     For i = 1 To n
-        axtel = 0: aytel = 0
+        Ax = 0: Ay = 0
     
         If index = "Similarity" Then
-            Ax_tel = xekt(1) + xekt(2) * xvect(i) + xekt(3) * yvect(i)
-            Ay_tel = xekt(4) + xekt(2) * yvect(i) - xekt(3) * xvect(i)
+            AxFinal = xEstimation(1) + xEstimation(2) * xvect(i) + xEstimation(3) * yvect(i)
+            AyFinal = xEstimation(4) + xEstimation(2) * yvect(i) - xEstimation(3) * xvect(i)
         Else
             For j = 1 To met
-                axtel = xekt(j) * xvect(i) ^ kr(j) * yvect(i) ^ lr(j)
-                aytel = xekt(j + met) * xvect(i) ^ kr(j) * yvect(i) ^ lr(j)
-                Ax_tel = Ax_tel + axtel
-                Ay_tel = Ay_tel + aytel
+                Ax = xEstimation(j) * xvect(i) ^ kr(j) * yvect(i) ^ lr(j)
+                Ay = xEstimation(j + met) * xvect(i) ^ kr(j) * yvect(i) ^ lr(j)
+                AxFinal = AxFinal + Ax
+                AyFinal = AyFinal + Ay
             Next j
         End If
 
-        Dx(i) = Ax_tel - b(i)
-        Dy(i) = Ay_tel - b(n + i)
+        Dx(i) = AxFinal - b(i)
+        Dy(i) = AyFinal - b(n + i)
         sse(i) = Sqr(Dx(i) ^ 2 + Dy(i) ^ 2)
-        Ax_tel = 0
-        Ay_tel = 0
+        AxFinal = 0
+        AyFinal = 0
     Next i
 
 
-    Ax_tel = 0: Ay_tel = 0: axtel = 0: aytel = 0: gr = 0
+    AxFinal = 0: AyFinal = 0: Ax = 0: Ay = 0: gr = 0
 
 End Sub

@@ -110,5 +110,5 @@ End Sub
 
 ' Apply commandButton
 Private Sub applyButton_Click()
-    Call applyTransformation(met, kr, lr, xekt)
+    Call applyTransformation(met, kr, lr, xEstimation)
 End Sub

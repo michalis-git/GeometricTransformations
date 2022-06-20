@@ -10,7 +10,7 @@ Public sigma_aposteriori As Double
 Public degreesOfFreedom As Single
 Public numberOfPoints As Integer
 Public b As Variant
-Public xekt As Variant
+Public xEstimation As Variant
 
 ' points are of type: ' 1) 36.1565464, 28.545865156
 Function xForIndexFromListBox(i As Integer, listBox As ListBox) As Long
@@ -143,18 +143,18 @@ ReDim inverse_N(0 To 2 * numberOfPoints-1, 0 To 2 * numberOfPoints-1) As Variant
 Call inverseMatrix(numberOfPoints, Nmat)
 
 
-'typwnei ton xekt (ektimiseis parametrwn)
-ReDim xekt(1 To 2 * numberOfPoints)
+'typwnei ton xEstimation (ektimiseis parametrwn)
+ReDim xEstimation(1 To 2 * numberOfPoints)
 For k = 1 To 2 * numberOfPoints
         For l = 1 To 2 * numberOfPoints
-            xekt(k) = xekt(k) + inverse_N(k, l) * u(l)
+            xEstimation(k) = xEstimation(k) + inverse_N(k, l) * u(l)
         Next l
 Next k
 
 ReDim AX_mat(1 To 2 * n)
 For k = 1 To 2 * n
         For l = 1 To 2 * numberOfPoints
-            AX_mat(k) = AX_mat(k) + A(k, l) * xekt(l)
+            AX_mat(k) = AX_mat(k) + A(k, l) * xEstimation(l)
         Next l
 Next k
 
@@ -179,6 +179,6 @@ Call FTEST(degreesOfFreedom, F_test)
 End If
 End If
 
-Call residual(xvect, yvect, xekt, n)
+Call residual(xvect, yvect, xEstimation, n)
 
 End Sub
