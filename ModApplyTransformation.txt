@@ -109,19 +109,11 @@ Call DesignMatrixA(index, numberOfPoints, A)
 ' where n is the number of the observations (the selected pairs of points).
 ' As long as c^2 is unknown, matrix P is equal to the identity matrix I'
 ReDim P(0 To 2 * numberOfPoints-1, 0 To 2 * numberOfPoints-1) As Variant
-For i = 0 To 2 * numberOfPoints-1
-    For j = 0 To 2 * numberOfPoints-1
-        If i = j Then
-            P(i, j) = 1
-        Else
-            P(i, j) = 0
-        End If
-    Next j
-Next i
+P = identityMatrix(2 * numberOfPoints)
 
-'TRANSPOSE MATRIX
+'transpose design matrix A
 ReDim Transpose_A(1 To 2 * numberOfPoints, 1 To 2 * n) As Variant
-Call TransposeMatrix(numberOfPoints, A, n)
+Transpose_A = transposeMatrix(A)
 
 'Calculates the product [A]*[A-1] which must be always equal to the Singular Matrix [I]
 'The same result must also come up for the product: [A-1]*[A]=[I]
@@ -131,33 +123,24 @@ Call TransposeMatrix(numberOfPoints, A, n)
 ' the transpose design matrix (A) with weight matrix P 
 ' (AT*P)
 ReDim ATP(1 To 2 * numberOfPoints, 1 To 2 * n)
-For k = 1 To 2 * numberOfPoints
-    For m = 1 To 2 * n
-        ATP(k, m) = ATP(k, m) + Transpose_A(k, m) * P(m, m)
-    Next m
-Next k
+ATP = multiplyMatrices(Transpose_A, P)
 
 
-'PINAKES KANONIKWN E3ISWSEWN (N KAI u)
-'N = TRANSPOSE_A * P * A
+' Normal equations matrix is the product of ((Transpose_A * P) * A)
+' N = (Transpose_A * P) * A
 ReDim Nmat(1 To 2 * numberOfPoints, 1 To 2 * numberOfPoints)
-For k = 1 To 2 * numberOfPoints
-    For m = 1 To 2 * numberOfPoints
-        For l = 1 To 2 * n
-            Nmat(k, m) = Nmat(k, m) + ATP(k, l) * A(l, m)
-        Next l
-    Next m
-Next k
+Nmat = multiplyMatrices(ATP, A)
 
+
+' Normal equations vector u which is necessary for the final estimation of 
+' the unknown transformation parameters is given by: ((Transpose_A * P) * b)
+' u = ((Transpose_A * P) * b)
 ReDim u(1 To 2 * numberOfPoints) As Variant
-For k = 1 To 2 * numberOfPoints
-        For l = 1 To 2 * n
-            u(k) = u(k) + ATP(k, l) * b(l)
-        Next l
-Next k
+u = multiplyMatrices(ATP, b)
+
 
 ReDim inverse_N(0 To 2 * numberOfPoints-1, 0 To 2 * numberOfPoints-1) As Variant
-Call Inverse_Table(numberOfPoints, Nmat) ', inverse_N)
+Call inverseMatrix(numberOfPoints, Nmat)
 
 
 'typwnei ton xekt (ektimiseis parametrwn)
